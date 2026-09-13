@@ -13,7 +13,7 @@ export async function playAudioUrl(url?: string | null): Promise<void> {
       return;
     }
 
-    // Try expo-audio first (Expo SDK 53+ standard)
+    // Expo SDK 53+ standard expo-audio
     try {
       const expoAudio = require('expo-audio');
       if (expoAudio && typeof expoAudio.createAudioPlayer === 'function') {
@@ -23,20 +23,8 @@ export async function playAudioUrl(url?: string | null): Promise<void> {
           return;
         }
       }
-    } catch {
-      // expo-audio not available
-    }
-
-    // Try expo-av safely if native module exists
-    try {
-      const expoAv = require('expo-av');
-      if (expoAv && expoAv.Audio && expoAv.Audio.Sound) {
-        const { sound } = await expoAv.Audio.Sound.createAsync({ uri: url });
-        await sound.playAsync();
-        return;
-      }
-    } catch {
-      // ExponentAV native module not available in Expo Go
+    } catch (e) {
+      console.warn('expo-audio playback error:', e);
     }
   } catch (err) {
     console.warn('Audio playback error:', err);
