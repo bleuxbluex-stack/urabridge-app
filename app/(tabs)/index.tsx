@@ -331,7 +331,6 @@ export default function HomeScreen() {
 
         {/* User Profile Avatar with Active Dot */}
         <View style={styles.headerRightGroup}>
-          <LanguageToggle />
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/profile')}
             activeOpacity={0.8}

@@ -22,12 +22,11 @@ export default function WelcomeScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Header with Brand & Language Switcher */}
+        {/* Top Header with Brand */}
         <View style={styles.topBar}>
           <View style={styles.brandBadge}>
             <Text style={styles.logoText}>URA</Text>
           </View>
-          <LanguageToggle />
         </View>
 
         <Text style={styles.tagline}>{t('tagline')}</Text>

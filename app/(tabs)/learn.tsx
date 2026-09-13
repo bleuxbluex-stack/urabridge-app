@@ -182,9 +182,8 @@ export default function LearnScreen() {
             </Text>
           </View>
 
-          {/* Right Group: LanguageToggle & User Profile Avatar */}
+          {/* Right Group: User Profile Avatar */}
           <View style={styles.headerRightGroup}>
-            <LanguageToggle />
             <TouchableOpacity
               onPress={() => router.push('/(tabs)/profile')}
               activeOpacity={0.8}

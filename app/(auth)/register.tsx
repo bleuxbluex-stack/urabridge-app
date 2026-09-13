@@ -107,7 +107,6 @@ export default function RegisterScreen() {
             >
               <ArrowLeft size={24} color={Colors.light.text} />
             </TouchableOpacity>
-            <LanguageToggle />
           </View>
 
           <View style={styles.header}>
@@ -160,10 +159,14 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Footer */}
-          <View style={styles.footer}>
+          {/* Footer Link to Login */}
+          <TouchableOpacity
+            style={styles.footer}
+            onPress={() => router.push('/(auth)/login')}
+            activeOpacity={0.7}
+          >
             <Text style={styles.footerText}>{t('hasAccount')}</Text>
-          </View>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

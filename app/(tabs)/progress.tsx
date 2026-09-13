@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
   ViewStyle,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -125,9 +126,34 @@ export default function ProgressScreen() {
     setRefreshing(false);
   };
 
+  const [achFilter, setAchFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
+
   const streak = Math.max(profile?.current_streak ?? 0, completedCount > 0 ? 1 : 0);
   const longestStreak = Math.max(profile?.longest_streak ?? 0, streak);
   const totalXp = profile?.xp ?? 0;
+
+  // Calculate unlocked achievements
+  const unlockedCount = achievements.filter((ach) => {
+    const isUnlocked =
+      !!(ach.id && userAchievements[ach.id]) ||
+      !!(ach.code && userAchievements[ach.code]) ||
+      (ach.requirement_type === 'lessons_completed' && completedCount >= (ach.requirement_value || 1)) ||
+      (ach.requirement_type === 'xp' && totalXp >= (ach.requirement_value || 20)) ||
+      (ach.requirement_type === 'current_streak' && streak >= (ach.requirement_value || 1));
+    return isUnlocked;
+  }).length;
+
+  const filteredAchievements = achievements.filter((ach) => {
+    const isUnlocked =
+      !!(ach.id && userAchievements[ach.id]) ||
+      !!(ach.code && userAchievements[ach.code]) ||
+      (ach.requirement_type === 'lessons_completed' && completedCount >= (ach.requirement_value || 1)) ||
+      (ach.requirement_type === 'xp' && totalXp >= (ach.requirement_value || 20)) ||
+      (ach.requirement_type === 'current_streak' && streak >= (ach.requirement_value || 1));
+    if (achFilter === 'unlocked') return isUnlocked;
+    if (achFilter === 'locked') return !isUnlocked;
+    return true;
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -140,7 +166,6 @@ export default function ProgressScreen() {
             {language === 'en' ? 'Track your achievements and activity' : 'Ndiqni arritjet dhe aktivitetin tuaj'}
           </Text>
         </View>
-        <LanguageToggle />
       </View>
 
       <ScrollView
@@ -188,38 +213,72 @@ export default function ProgressScreen() {
 
         {/* Achievements Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {language === 'en' ? 'Achievements & Badges' : 'Arritjet & Medaljet'}
-          </Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>
+              {language === 'en' ? 'Achievements & Badges' : 'Arritjet & Medaljet'}
+            </Text>
+            <View style={styles.unlockedCountBadge}>
+              <Trophy size={14} color="#D97706" />
+              <Text style={styles.unlockedCountText}>
+                {unlockedCount} / {achievements.length || 6}
+              </Text>
+            </View>
+          </View>
+
+          {/* Filter Pills: All | Unlocked | Locked */}
+          <View style={styles.filterPillRow}>
+            <TouchableOpacity
+              style={[styles.filterPill, achFilter === 'all' && styles.activeFilterPill]}
+              onPress={() => setAchFilter('all')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.filterPillText, achFilter === 'all' && styles.activeFilterPillText]}>
+                {language === 'en' ? 'All' : 'Të Gjitha'} ({achievements.length || 6})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterPill, achFilter === 'unlocked' && styles.activeFilterPill]}
+              onPress={() => setAchFilter('unlocked')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.filterPillText, achFilter === 'unlocked' && styles.activeFilterPillText]}>
+                🏆 {language === 'en' ? 'Unlocked' : 'Të Zhbllokuara'} ({unlockedCount})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterPill, achFilter === 'locked' && styles.activeFilterPill]}
+              onPress={() => setAchFilter('locked')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.filterPillText, achFilter === 'locked' && styles.activeFilterPillText]}>
+                🔒 {language === 'en' ? 'Locked' : 'Të Kyçura'} ({(achievements.length || 6) - unlockedCount})
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.achievementsGrid}>
-            {achievements.length === 0 ? (
-              // Default preview achievement card if DB is empty
-              <View style={styles.achCard}>
-                <View style={styles.achHeaderRow}>
-                  <View style={[styles.achIconCircle, styles.unlockedIconCircle]}>
-                    <Trophy size={20} color="#EAB308" />
-                  </View>
-                  <View style={styles.xpPill}>
-                    <Text style={styles.xpPillText}>+50 XP</Text>
-                  </View>
-                </View>
-                <Text style={styles.achTitle}>
-                  {language === 'en' ? 'First Steps' : 'Hapat e Parë'}
-                </Text>
-                <Text style={styles.achDesc}>
+            {filteredAchievements.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Trophy size={28} color="#94A3B8" style={{ marginBottom: Spacing.xs }} />
+                <Text style={styles.emptyText}>
                   {language === 'en'
-                    ? 'Complete your first German lesson'
-                    : 'Përfundo mësimin tënd të parë në gjermanisht'}
+                    ? 'No achievements found in this category.'
+                    : 'Nuk u gjetën arritje në këtë kategori.'}
                 </Text>
               </View>
             ) : (
-              achievements.map((ach) => {
-                const isUnlocked = !!(ach.id && userAchievements[ach.id]) || !!(ach.code && userAchievements[ach.code]);
+              filteredAchievements.map((ach) => {
+                const isUnlocked =
+                  !!(ach.id && userAchievements[ach.id]) ||
+                  !!(ach.code && userAchievements[ach.code]) ||
+                  (ach.requirement_type === 'lessons_completed' && completedCount >= (ach.requirement_value || 1)) ||
+                  (ach.requirement_type === 'xp' && totalXp >= (ach.requirement_value || 20)) ||
+                  (ach.requirement_type === 'current_streak' && streak >= (ach.requirement_value || 1));
 
                 return (
                   <View
-                    key={ach.id}
-                    style={[styles.achCard, !isUnlocked && styles.lockedAchCard]}
+                    key={ach.id || ach.code}
+                    style={[styles.achCard, isUnlocked ? styles.unlockedAchCard : styles.lockedAchCard]}
                   >
                     <View style={styles.achHeaderRow}>
                       <View
@@ -229,28 +288,34 @@ export default function ProgressScreen() {
                         ]}
                       >
                         {isUnlocked ? (
-                          <Trophy size={20} color="#EAB308" />
+                          <Trophy size={22} color="#D97706" />
                         ) : (
                           <Lock size={20} color="#94A3B8" />
                         )}
                       </View>
-                      <View style={[styles.xpPill, !isUnlocked && styles.lockedXpPill]}>
-                        <Text style={[styles.xpPillText, !isUnlocked && styles.lockedXpPillText]}>
+                      <View style={[styles.xpPill, isUnlocked ? styles.unlockedXpPill : styles.lockedXpPill]}>
+                        {isUnlocked ? (
+                          <CheckCircle2 size={12} color="#059669" style={{ marginRight: 2 }} />
+                        ) : null}
+                        <Text style={[styles.xpPillText, isUnlocked ? styles.unlockedXpPillText : styles.lockedXpPillText]}>
                           +{ach.xp_reward} XP
                         </Text>
                       </View>
                     </View>
 
-                    <Text
-                      style={[
-                        styles.achTitle,
-                        !isUnlocked && styles.lockedText,
-                      ]}
-                    >
+                    <Text style={[styles.achTitle, !isUnlocked && styles.lockedText]}>
                       {ach.title}
                     </Text>
                     {ach.description ? (
                       <Text style={styles.achDesc}>{ach.description}</Text>
+                    ) : null}
+
+                    {isUnlocked ? (
+                      <View style={styles.unlockedTag}>
+                        <Text style={styles.unlockedTagText}>
+                          ✓ {language === 'en' ? 'Unlocked' : 'E Zhbllokuar'}
+                        </Text>
+                      </View>
                     ) : null}
                   </View>
                 );
@@ -381,6 +446,51 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.lg,
     color: Colors.light.text,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.xs,
+  },
+  unlockedCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  unlockedCountText: {
+    fontFamily: Typography.fontFamily.bold,
+    fontSize: Typography.fontSize.xs,
+    color: '#D97706',
+  },
+  filterPillRow: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  filterPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.full,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  activeFilterPill: {
+    backgroundColor: Colors.light.primary,
+    borderColor: Colors.light.primary,
+  },
+  filterPillText: {
+    fontFamily: Typography.fontFamily.bold,
+    fontSize: Typography.fontSize.xs,
+    color: Colors.light.textSecondary,
+  },
+  activeFilterPillText: {
+    color: '#FFFFFF',
+  },
   achievementsGrid: {
     gap: Spacing.md,
   },
@@ -395,6 +505,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
+  },
+  unlockedAchCard: {
+    borderColor: '#A7F3D0',
+    backgroundColor: '#FFFFFF',
   },
   lockedAchCard: {
     backgroundColor: '#F8FAFC',
@@ -414,16 +528,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   unlockedIconCircle: {
-    backgroundColor: '#FEF08A',
+    backgroundColor: '#FEF3C7',
   },
   lockedIconCircle: {
     backgroundColor: '#E2E8F0',
   },
   xpPill: {
-    backgroundColor: '#FEF08A',
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: BorderRadius.full,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  unlockedXpPill: {
+    backgroundColor: '#D1FAE5',
   },
   lockedXpPill: {
     backgroundColor: '#E2E8F0',
@@ -431,7 +549,9 @@ const styles = StyleSheet.create({
   xpPillText: {
     fontFamily: Typography.fontFamily.bold,
     fontSize: 11,
-    color: '#D97706',
+  },
+  unlockedXpPillText: {
+    color: '#059669',
   },
   lockedXpPillText: {
     color: '#64748B',
@@ -449,6 +569,19 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.xs,
     color: Colors.light.textSecondary,
     marginTop: 2,
+  },
+  unlockedTag: {
+    marginTop: Spacing.xs + 2,
+    alignSelf: 'flex-start',
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+  },
+  unlockedTagText: {
+    fontFamily: Typography.fontFamily.bold,
+    fontSize: 11,
+    color: '#059669',
   },
   emptyCard: {
     backgroundColor: '#FFFFFF',

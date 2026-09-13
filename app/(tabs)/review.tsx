@@ -207,7 +207,6 @@ export default function ReviewScreen() {
             {language === 'en' ? 'Spaced Repetition System' : 'Sistemi i përsëritjes me hapësirë'}
           </Text>
         </View>
-        <LanguageToggle />
       </View>
 
       <ScrollView

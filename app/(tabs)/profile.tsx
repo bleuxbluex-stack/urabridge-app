@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Colors, Typography, Spacing, BorderRadius } from '@/constants/theme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import {
   User,
   Crown,
@@ -30,12 +30,14 @@ import {
   ChevronRight,
   Target,
   Sparkles,
+  Globe,
 } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t, language } = useTranslation();
+  const { setLanguage } = useLanguageStore();
   const { user, profile, preferences, signOut } = useAuthStore();
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(
@@ -123,7 +125,6 @@ export default function ProfileScreen() {
             {language === 'en' ? 'Account & Preferences' : 'Llogaria & Preferencat'}
           </Text>
         </View>
-        <LanguageToggle />
       </View>
 
       <ScrollView
@@ -258,6 +259,40 @@ export default function ProfileScreen() {
                 onValueChange={(val) => handleTogglePreference('haptic', val)}
                 trackColor={{ false: '#CBD5E1', true: '#1E56E0' }}
               />
+            </View>
+
+            <View style={styles.divider} />
+
+            {/* Language Switcher Row */}
+            <View style={styles.settingRow}>
+              <View style={styles.settingLabelGroup}>
+                <View style={[styles.settingIconBadge, { backgroundColor: '#ECFDF5' }]}>
+                  <Globe size={18} color="#10B981" />
+                </View>
+                <Text style={styles.settingText}>
+                  {language === 'en' ? 'App Language' : 'Gjuha e Aplikacionit'}
+                </Text>
+              </View>
+              <View style={styles.langPillContainer}>
+                <TouchableOpacity
+                  style={[styles.langBtnPill, language === 'sq' && styles.langBtnPillActive]}
+                  onPress={() => setLanguage('sq')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.langBtnText, language === 'sq' && styles.langBtnTextActive]}>
+                    🇦🇱 SQ
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.langBtnPill, language === 'en' && styles.langBtnPillActive]}
+                  onPress={() => setLanguage('en')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.langBtnText, language === 'en' && styles.langBtnTextActive]}>
+                    🇬🇧 EN
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -512,5 +547,33 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily.bold,
     fontSize: Typography.fontSize.md,
     color: '#EF4444',
+  },
+  langPillContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F5F9',
+    borderRadius: BorderRadius.lg,
+    padding: 3,
+    gap: 4,
+  },
+  langBtnPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.md,
+  },
+  langBtnPillActive: {
+    backgroundColor: Colors.light.primary,
+    shadowColor: Colors.light.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  langBtnText: {
+    fontFamily: Typography.fontFamily.bold,
+    fontSize: Typography.fontSize.xs,
+    color: Colors.light.textSecondary,
+  },
+  langBtnTextActive: {
+    color: '#FFFFFF',
   },
 });
