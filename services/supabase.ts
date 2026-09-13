@@ -3,8 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://tzhtpjsgpruagfusjsdr.supabase.co';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+const DEFAULT_SUPABASE_URL = 'https://urabridge-app-proxy.netlify.app';
+const DEFAULT_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6aHRwanNncHJ1YWdmdXNqc2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MzgzNzAsImV4cCI6MjEwNDQxNDM3MH0.tUL9nvBIw7khZ7Ybz_ie1OwmaEXETCHrncLJEInr85A';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
 const LargeSecureStore = {
   getItem: async (key: string) => {

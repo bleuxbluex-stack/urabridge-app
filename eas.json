@@ -7,7 +7,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://urabridge-app-proxy.netlify.app",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6aHRwanNncHJ1YWdmdXNqc2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MzgzNzAsImV4cCI6MjEwNDQxNDM3MH0.tUL9nvBIw7khZ7Ybz_ie1OwmaEXETCHrncLJEInr85A"
       }
     },
     "preview": {
@@ -16,7 +18,9 @@
         "buildType": "apk"
       },
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://urabridge-app-proxy.netlify.app",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6aHRwanNncHJ1YWdmdXNqc2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MzgzNzAsImV4cCI6MjEwNDQxNDM3MH0.tUL9nvBIw7khZ7Ybz_ie1OwmaEXETCHrncLJEInr85A"
       }
     },
     "production": {
@@ -24,7 +28,9 @@
         "buildType": "apk"
       },
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://urabridge-app-proxy.netlify.app",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6aHRwanNncHJ1YWdmdXNqc2RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MzgzNzAsImV4cCI6MjEwNDQxNDM3MH0.tUL9nvBIw7khZ7Ybz_ie1OwmaEXETCHrncLJEInr85A"
       }
     }
   }
