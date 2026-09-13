@@ -16,7 +16,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/services/supabase';
 import { Card } from '@/components/ui/Card';
 import { Colors, Typography, Spacing, BorderRadius } from '@/constants/theme';
-import { Lock, Check, Play, Star, BookOpen, ChevronRight } from 'lucide-react-native';
+import { Lock, Check, Play, Star, BookOpen, ChevronRight, User } from 'lucide-react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
 
@@ -190,10 +190,16 @@ export default function LearnScreen() {
               style={styles.avatarWrapper}
             >
               <View style={styles.avatarCircle}>
-                <Image
-                  source={{ uri: profile?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop' }}
-                  style={styles.avatarImage}
-                />
+                {profile?.avatar_url ? (
+                  <Image
+                    source={{ uri: profile.avatar_url }}
+                    style={styles.avatarImage}
+                  />
+                ) : (
+                  <View style={styles.avatarPlaceholder}>
+                    <User size={20} color="#1E56E0" />
+                  </View>
+                )}
                 <View style={styles.onlineBadge} />
               </View>
             </TouchableOpacity>
@@ -411,6 +417,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 22,
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 22,
+    backgroundColor: '#E0F2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   onlineBadge: {
     position: 'absolute',

@@ -31,6 +31,7 @@ import {
   CheckCircle2,
   MessageCircle,
   Hash,
+  User,
 } from 'lucide-react-native';
 
 export default function HomeScreen() {
@@ -337,14 +338,16 @@ export default function HomeScreen() {
             style={styles.avatarWrapper}
           >
             <View style={styles.avatarCircle}>
-              <Image
-                source={{
-                  uri:
-                    profile?.avatar_url ||
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
-                }}
-                style={styles.avatarImage}
-              />
+              {profile?.avatar_url ? (
+                <Image
+                  source={{ uri: profile.avatar_url }}
+                  style={styles.avatarImage}
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <User size={20} color="#1E56E0" />
+                </View>
+              )}
               <View style={styles.onlineBadge} />
             </View>
           </TouchableOpacity>
@@ -743,6 +746,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 22,
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 22,
+    backgroundColor: '#E0F2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   onlineBadge: {
     position: 'absolute',
