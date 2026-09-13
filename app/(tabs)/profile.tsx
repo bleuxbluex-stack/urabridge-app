@@ -8,12 +8,15 @@ import {
   Switch,
   Alert,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/services/supabase';
+import { uploadToCloudinary } from '@/services/cloudinary';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -31,6 +34,7 @@ import {
   Target,
   Sparkles,
   Globe,
+  Camera,
 } from 'lucide-react-native';
 
 export default function ProfileScreen() {
@@ -38,7 +42,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { t, language } = useTranslation();
   const { setLanguage } = useLanguageStore();
-  const { user, profile, preferences, signOut } = useAuthStore();
+  const { user, profile, preferences, signOut, fetchProfile } = useAuthStore();
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     preferences?.notifications_enabled ?? true
@@ -50,6 +54,69 @@ export default function ProfileScreen() {
     preferences?.haptic_enabled ?? true
   );
   const [isPremium, setIsPremium] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const handlePickAvatar = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          language === 'en' ? 'Permission Required' : 'Kërkohet Leje',
+          language === 'en'
+            ? 'Please allow access to your photo library to update your profile picture.'
+            : 'Ju lutemi lejoni qasjen në galeri për të ndryshuar foton e profilit.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0].uri) {
+        setIsUploadingAvatar(true);
+        const selectedUri = result.assets[0].uri;
+
+        // Upload image to Cloudinary
+        const cdnUrl = await uploadToCloudinary(selectedUri);
+
+        // Update profile in Supabase
+        if (user) {
+          const { error } = await supabase
+            .from('profiles' as any)
+            .update({
+              avatar_url: cdnUrl,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id);
+
+          if (error) throw error;
+
+          // Refresh store profile
+          await fetchProfile();
+
+          Alert.alert(
+            language === 'en' ? 'Success' : 'Sukses',
+            language === 'en'
+              ? 'Profile picture updated successfully!'
+              : 'Fotoja e profilit u përditësua me sukses!'
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error('Error uploading profile picture:', err);
+      Alert.alert(
+        language === 'en' ? 'Upload Failed' : 'Dështoi Ngarkimi',
+        err.message || (language === 'en' ? 'Failed to upload photo.' : 'Nuk u arrit të ngarkohet fotoja.')
+      );
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   const fetchEntitlement = async () => {
     if (!user) return;
@@ -136,13 +203,27 @@ export default function ProfileScreen() {
       >
         {/* User Profile Header Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatarWrapper}>
+          <TouchableOpacity
+            style={styles.avatarWrapper}
+            onPress={handlePickAvatar}
+            disabled={isUploadingAvatar}
+            activeOpacity={0.8}
+          >
             <Image
               source={{ uri: profile?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop' }}
               style={styles.avatarImage}
             />
+            {isUploadingAvatar ? (
+              <View style={styles.uploadingOverlay}>
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              </View>
+            ) : (
+              <View style={styles.cameraBadge}>
+                <Camera size={12} color="#FFFFFF" />
+              </View>
+            )}
             <View style={styles.onlineBadge} />
-          </View>
+          </TouchableOpacity>
 
           <View style={styles.profileDetails}>
             <Text style={styles.profileName}>
@@ -386,6 +467,26 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 30,
+  },
+  cameraBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#1E56E0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  uploadingOverlay: {
+    ...StyleSheet.absoluteFill,
+    borderRadius: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   onlineBadge: {
     position: 'absolute',
