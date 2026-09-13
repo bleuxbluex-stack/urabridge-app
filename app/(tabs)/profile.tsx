@@ -74,15 +74,21 @@ export default function ProfileScreen() {
         mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 0.7,
+        base64: true,
       });
 
-      if (!result.canceled && result.assets && result.assets[0].uri) {
+      if (!result.canceled && result.assets && result.assets[0]) {
         setIsUploadingAvatar(true);
-        const selectedUri = result.assets[0].uri;
+        const asset = result.assets[0];
+
+        // Format as base64 Data URI string to bypass React Native FormData file blob polyfill issue
+        const uploadPayload = asset.base64
+          ? `data:${asset.mimeType || 'image/jpeg'};base64,${asset.base64}`
+          : asset.uri;
 
         // Upload image to Cloudinary
-        const cdnUrl = await uploadToCloudinary(selectedUri);
+        const cdnUrl = await uploadToCloudinary(uploadPayload);
 
         // Update profile in Supabase
         if (user) {
@@ -209,10 +215,16 @@ export default function ProfileScreen() {
             disabled={isUploadingAvatar}
             activeOpacity={0.8}
           >
-            <Image
-              source={{ uri: profile?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop' }}
-              style={styles.avatarImage}
-            />
+            {profile?.avatar_url ? (
+              <Image
+                source={{ uri: profile.avatar_url }}
+                style={styles.avatarImage}
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <User size={28} color="#1E56E0" />
+              </View>
+            )}
             {isUploadingAvatar ? (
               <View style={styles.uploadingOverlay}>
                 <ActivityIndicator size="small" color="#FFFFFF" />
@@ -467,6 +479,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 30,
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    backgroundColor: '#E0F2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cameraBadge: {
     position: 'absolute',
