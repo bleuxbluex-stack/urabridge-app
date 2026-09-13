@@ -4,22 +4,30 @@
     "slug": "uribridge-app",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "scheme": "uribridge",
     "userInterfaceStyle": "automatic",
     "splash": {
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#F8F7F3"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.uribridge.app"
+      "bundleIdentifier": "com.uribridge.app",
+      "icon": "./assets/icon.png"
     },
     "android": {
-      "package": "com.uribridge.app"
+      "package": "com.uribridge.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E56E0"
+      }
     },
     "web": {
       "bundler": "metro",
-      "output": "static"
+      "output": "static",
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-router",
