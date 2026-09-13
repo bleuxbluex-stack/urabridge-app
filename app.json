@@ -7,6 +7,12 @@
     "icon": "./assets/icon.png",
     "scheme": "uribridge",
     "userInterfaceStyle": "automatic",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5839f1a4-e171-4fd9-bb2a-b7785ed5dab5"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.uribridge.app",
