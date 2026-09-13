@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Ura",
+    "slug": "uribridge-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "uribridge",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#F8F7F3"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.uribridge.app"
+    },
+    "android": {
+      "package": "com.uribridge.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,13 @@
+[build]
+  publish = "public"
+
+[[edge_functions]]
+  function = "supabase-proxy"
+  path = "/*"
+
+[[redirects]]
+  from = "/*"
+  to = "https://tzhtpjsgpruagfusjsdr.supabase.co/:splat"
+  status = 200
+  force = true
+  headers = { Access-Control-Allow-Origin = "*", Access-Control-Allow-Headers = "*", Access-Control-Allow-Methods = "*" }
